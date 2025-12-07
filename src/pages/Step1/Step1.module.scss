@@ -1,0 +1,20 @@
+@use '../../styles/variables' as *; 
+
+.inputWrapper {
+  margin-bottom: $space-md; 
+}
+
+.actions {
+  display: flex;
+  gap: $space-md;
+  margin-top: $space-lg;
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    width: 100%;
+    
+    button {
+      width: 100%;
+    }
+  }
+}

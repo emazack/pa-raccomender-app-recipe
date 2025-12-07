@@ -1,0 +1,91 @@
+@use 'variables' as *;
+@use 'reset';
+
+.container {
+  max-width: 600px;
+  margin: $space-xl auto;
+  padding: $space-md;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: $text-main;
+  margin-bottom: $space-lg;
+  text-align: center;
+}
+
+h2 {
+  font-size: 1.5rem;
+  color: $text-main;
+  margin-bottom: $space-md;
+}
+
+p {
+  color: $text-muted;
+  margin-bottom: $space-md;
+}
+
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-sm $space-lg;
+  background-color: $primary;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: $radius;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  font-size: 1rem;
+  gap: $space-sm;
+
+  &:hover {
+    background-color: $primary-hover;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    background-color: $border;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  &.secondary {
+    background-color: white;
+    color: $text-main;
+    border: 1px solid $border;
+    
+    &:hover {
+      background-color: $background;
+    }
+  }
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: $space-md;
+  border: 2px solid $border;
+  border-radius: $radius;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  outline: none;
+  background: white;
+
+  &:focus {
+    border-color: $primary;
+  }
+}
+
+.card {
+  background: $surface;
+  padding: $space-lg;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  margin-bottom: $space-md;
+}
