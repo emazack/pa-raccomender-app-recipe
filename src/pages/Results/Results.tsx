@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaHeart, FaThumbsDown, FaRedo } from 'react-icons/fa'; // Assicurati di aver installato react-icons
-
+import { FaHeart, FaThumbsDown, FaRedo } from 'react-icons/fa';
 import { mealService } from '../../api/mealService';
 import { useWizard } from '../../context/context';
 import { useHistory } from '../../hooks/useHistory';
@@ -43,31 +42,48 @@ export const Results = () => {
   }, []);
 
   useEffect(() => {
-    const fetchCandidates = async () => {
-      if (!state.preferences.ingredient) {
+    const fetchAndFilterCandidates = async () => {
+      if (!state.preferences.ingredient || !state.preferences.area) {
         navigate('/');
         return;
       }
 
+      setLoading(true);
+      setError(null);
+
       try {
-        setLoading(true);
-        const response = await mealService.filterByIngredient(state.preferences.ingredient);
-        
-        if (response.meals && response.meals.length > 0) {
-          setCandidateList(response.meals);
-          pickRandomRecipe(response.meals);
+        const [areaResponse, ingredientResponse] = await Promise.all([
+          mealService.filterByArea(state.preferences.area),
+          mealService.filterByIngredient(state.preferences.ingredient)
+        ]);
+
+        const areaMeals = areaResponse.meals || [];
+        const ingredientMeals = ingredientResponse.meals || [];
+
+        const areaIds = new Set(areaMeals.map(meal => meal.idMeal));
+
+        const perfectMatches = ingredientMeals.filter(meal => 
+          areaIds.has(meal.idMeal)
+        );
+
+        if (perfectMatches.length > 0) {
+          setCandidateList(perfectMatches);
+          pickRandomRecipe(perfectMatches);
         } else {
-          setError(`No recipes found with ${state.preferences.ingredient}. Try another ingredient.`);
+          setError(`No ${state.preferences.area} recipes found with ${state.preferences.ingredient}. Try changing the ingredient.`);
           setLoading(false);
         }
+
       } catch (err) {
+        console.error(err);
         setError('Connection error. Please check your internet.');
         setLoading(false);
       }
     };
 
-    fetchCandidates();
-  }, [state.preferences.ingredient, navigate, pickRandomRecipe]);
+    fetchAndFilterCandidates();
+  }, [state.preferences.area, state.preferences.ingredient, navigate, pickRandomRecipe]);
+
 
   const handleFeedback = (preference: 'like' | 'dislike') => {
     if (!currentRecipe) return;
@@ -81,7 +97,6 @@ export const Results = () => {
     };
 
     saveInteraction(cleanRecipe, preference, state.preferences);
-
     navigate('/history');
   };
 
@@ -93,7 +108,9 @@ export const Results = () => {
   if (loading) {
     return (
       <div className="container">
-        <p className={styles.loadingMessage}>Hunting for the perfect recipe...</p>
+        <p className={styles.loadingMessage}>
+          Hunting for the perfect <b>{state.preferences.area}</b> recipe with <b>{state.preferences.ingredient}</b>...
+        </p>
       </div>
     );
   }
@@ -144,7 +161,6 @@ export const Results = () => {
               <p className={styles.feedbackTitle}>Did this match your preference?</p>
               
               <div className={styles.buttonsGrid}>
-                {/* LIKE Button */}
                 <button 
                   className={styles.btnLike} 
                   onClick={() => handleFeedback('like')}
@@ -152,7 +168,6 @@ export const Results = () => {
                   <FaHeart /> Yes, I love it!
                 </button>
 
-                {/* DISLIKE Button */}
                 <button 
                   className={styles.btnDislike} 
                   onClick={() => handleFeedback('dislike')}
