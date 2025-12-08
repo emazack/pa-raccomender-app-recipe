@@ -3,10 +3,6 @@ export interface Area {
   strArea: string;
 }
 
-export interface Category {
-  strCategory: string;
-}
-
 export interface Ingredient {
   idIngredient: string;
   strIngredient: string;
@@ -17,11 +13,10 @@ export interface Ingredient {
 export interface MealDetails {
   idMeal: string;
   strMeal: string;
-  strDrinkAlternate: string | null;
+  strMealThumb: string;
   strCategory: string;
   strArea: string;
   strInstructions: string;
-  strMealThumb: string;
   strYoutube: string;
   strSource: string;
   [key: string]: string | null; 
@@ -40,4 +35,20 @@ export interface ApiListResponse<T> {
 export interface UserPreferences {
   area: string;
   ingredient: string;
+}
+
+export interface Recipe {
+  id: string;
+  title: string;
+  image: string;
+  category: string;
+  area: string;
+}
+
+export interface HistoryItem {
+  id: string;
+  recipe: Recipe;
+  rating: 'like' | 'dislike';
+  timestamp: number;
+  inputs: UserPreferences;
 }
