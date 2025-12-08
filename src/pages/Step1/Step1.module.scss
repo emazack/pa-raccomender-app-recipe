@@ -1,20 +1,49 @@
-@use '../../styles/variables' as *; 
+@use '../../styles/variables' as *;
 
 .inputWrapper {
-  margin-bottom: $space-md; 
+  margin-bottom: $space-md;
+}
+
+.select {
+  width: 100%;
+  padding: $space-md;
+  border: 2px solid $border;
+  border-radius: $radius;
+  background-color: white;
+  font-size: 1rem;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  appearance: none; 
+
+  &:focus {
+    border-color: $primary;
+  }
 }
 
 .actions {
   display: flex;
   gap: $space-md;
   margin-top: $space-lg;
-  
+  justify-content: flex-end;
+
   @media (max-width: 480px) {
     flex-direction: column;
-    width: 100%;
     
     button {
       width: 100%;
     }
   }
+}
+
+.messageContainer {
+  display: flex;
+  justify-content: center;
+  padding: $space-xl;
+  color: $text-muted;
+}
+
+.errorMessage {
+  color: $danger;
+  font-weight: 500;
 }
