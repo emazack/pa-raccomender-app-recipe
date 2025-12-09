@@ -1,32 +1,38 @@
 import { apiClient } from './client';
 import type {
-    ApiListResponse,
-    Area,
-    Ingredient,
-    MealPreview,
-    MealDetails
+  ApiListResponse,
+  Area,
+  Ingredient,
+  MealPreview,
+  MealDetails
 } from '../types';
+
+const ENDPOINTS = {
+  LIST: '/list.php',
+  FILTER: '/filter.php',
+  LOOKUP: '/lookup.php',
+} as const;
 
 export const mealService = {
 
-  getAreas: () => {
-    return apiClient<ApiListResponse<Area>>('/list.php?a=list');
+  getAreas: (): Promise<ApiListResponse<Area>> => {
+    return apiClient<ApiListResponse<Area>>(`${ENDPOINTS.LIST}?a=list`);
   },
 
-  getIngredients: () => {
-    return apiClient<ApiListResponse<Ingredient>>('/list.php?i=list');
+  getIngredients: (): Promise<ApiListResponse<Ingredient>> => {
+    return apiClient<ApiListResponse<Ingredient>>(`${ENDPOINTS.LIST}?i=list`);
   },
 
-  filterByArea: (area: string) => {
-    return apiClient<ApiListResponse<MealPreview>>(`/filter.php?a=${area}`);
+  filterByArea: (area: string): Promise<ApiListResponse<MealPreview>> => {
+    return apiClient<ApiListResponse<MealPreview>>(`${ENDPOINTS.FILTER}?a=${area}`);
   },
 
-  filterByIngredient: (ingredient: string) => {
+  filterByIngredient: (ingredient: string): Promise<ApiListResponse<MealPreview>> => {
     const formattedIngredient = ingredient.replace(/ /g, '_');
-    return apiClient<ApiListResponse<MealPreview>>(`/filter.php?i=${formattedIngredient}`);
+    return apiClient<ApiListResponse<MealPreview>>(`${ENDPOINTS.FILTER}?i=${formattedIngredient}`);
   },
 
-  getMealById: (id: string) => {
-    return apiClient<ApiListResponse<MealDetails>>(`/lookup.php?i=${id}`);
+  getMealById: (id: string): Promise<ApiListResponse<MealDetails>> => {
+    return apiClient<ApiListResponse<MealDetails>>(`${ENDPOINTS.LOOKUP}?i=${id}`);
   }
 };
