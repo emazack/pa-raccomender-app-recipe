@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaHeart, FaThumbsDown } from 'react-icons/fa';
 
 import { useHistory } from '../../hooks/useHistory';
-import { useWizard } from '../../context/context';
+import { useWizard } from '../../context/WizardContext';
 import styles from './History.module.scss';
 
 export const History = () => {

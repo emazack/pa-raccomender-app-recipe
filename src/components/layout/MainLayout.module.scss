@@ -1,0 +1,33 @@
+@use '../../styles/variables' as *;
+
+.appWrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: $background;
+}
+
+.header {
+  text-align: center;
+  padding: $space-lg 0;
+  background-color: $surface;
+  border-bottom: 1px solid $border;
+  box-shadow: $shadow;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: $text-main;
+  margin: 0;
+  letter-spacing: -1px;
+
+  @media (max-width: 600px) {
+    font-size: 1.8rem; 
+  }
+}
+
+.mainContent {
+  flex: 1;
+  width: 100%;
+}

@@ -1,4 +1,3 @@
-// src/api/mealService.ts
 import { apiClient } from './client';
 import type {
     ApiListResponse,

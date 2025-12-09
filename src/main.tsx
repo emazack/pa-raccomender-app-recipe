@@ -1,11 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
-import { WizardProvider } from './context/context'
+import { WizardProvider } from './context/WizardContext.tsx'
 import './styles/main.scss'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
     <WizardProvider>
       <App />
     </WizardProvider>
+  </React.StrictMode>,
 )

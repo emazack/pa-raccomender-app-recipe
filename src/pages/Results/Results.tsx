@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaHeart, FaThumbsDown, FaRedo } from 'react-icons/fa';
 import { mealService } from '../../api/mealService';
-import { useWizard } from '../../context/context';
+import { useWizard } from '../../context/WizardContext';
 import { useHistory } from '../../hooks/useHistory';
 import styles from './Results.module.scss';
 

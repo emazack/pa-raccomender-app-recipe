@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mealService } from '../../api/mealService';
-import { useWizard } from '../../context/context';
+import { useWizard } from '../../context/WizardContext';
 import styles from './Step2.module.scss';
 import type { Ingredient } from '../../types';
 
