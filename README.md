@@ -1,73 +1,91 @@
-# React + TypeScript + Vite
+# Recipe App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Client-side React application that recommends recipes based on user preferences using the [TheMealDB](https://www.themealdb.com/api.php) API.
 
-Currently, two official plugins are available:
+Built with **React 18**, **TypeScript**, and **Vite**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+* **Two-Step Wizard:** Guided flow to select Cuisine (Area) and a specific Ingredient.
+* **Recommendation Engine:** Client-side logic to find the intersection between Area and Ingredient (since the API doesn't support dual filtering).
+* **Dynamic Search:** Autocomplete functionality with local filtering for instant feedback.
+* **Persistent History:** Likes and Dislikes are saved in `localStorage` and displayed in a dedicated History view.
+* **Responsive Design:** optimized for mobile and desktop using SCSS Modules.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
+* Node.js (v16 or higher)
+* npm or yarn
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Installation
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1.  Clone the repository
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+3.  Run the development server:
+    ```bash
+    npm run dev
+    ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+4.  Run tests:
+    ```bash
+    npm test
+    ```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+## Architecture & Design Decisions
+
+### 1. State Management: Context API + useReducer
+I chose **Context API** combined with the **Reducer Pattern** over external libraries.
+* **Why:** For an application of this scope it reduce complexity. The Reducer pattern ensures predictable state transitions (`SET_AREA`, `SET_INGREDIENT`, `RESET`).
+
+### 2. The Client-Side Join
+The public API provided (*TheMealDB*) does not support filtering by *Area* AND *Ingredient* simultaneously.
+* **The Problem:** Requesting "Italian" gives a list. Requesting "Chicken" gives another list. The API cannot give "Italian Chicken".
+* **My Solution:** I implemented a parallel fetching strategy in `src/utils/recommendationEngine.ts`:
+    1.  Fetch Area meals and Ingredient meals in parallel using `Promise.all` (minimizing network latency).
+    2.  Create a `Set` of IDs from one list for a fast search.
+    3.  Filter the second list against the Set to find the intersection.
+This ensures the recommendation strictly respects both constraints.
+
+### 3. Service Layer Pattern
+I abstracted all network logic into `src/api/mealService.ts`.
+* **Why:** This decouples the UI components from the specific implementation of `fetch`.
+
+### 4. Component Structure
+* **`pages/`**: "Smart" components (Controllers) that handle data fetching, state connection, and routing.
+* **`components/ui/`**: Reusable presentational components like `RecipeCard`, `Autocomplete`, and `HistoryItem`. They are reusable.
+
+---
+
+## Testing Strategy
+
+The project uses **Vitest** and **React Testing Library**.
+
+### Implemented Tests
+* **Infrastructure/API Tests:** I implemented unit test for the `mealService` to ensure correct endpoint calls and error handling without making real network requests (using mocks).
+* **Main Render:** Integration test (`App.test.tsx`) to verify the application mounts and renders core UI elements correctly.
+
+---
+
+## Tech Stack
+
+* **Core:** React 18, TypeScript
+* **Build Tool:** Vite
+* **Routing:** React Router DOM v6
+* **AI Powered Styling:** SCSS Modules + Global Variables
+* **Testing:** Vitest, React Testing Library, jsdom
+* **Icons:** React Icons
+
+---
+
+### Author
+Emanuele Zaccaria
