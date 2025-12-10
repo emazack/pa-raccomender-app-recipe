@@ -10,24 +10,33 @@ export const Step1 = () => {
   const { state, dispatch } = useWizard();
   
   const [areas, setAreas] = useState<Area[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<'idle' | 'loading' | 'error' | 'success'>('loading');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    let ignore = false;
+
     const fetchAreas = async () => {
       try {
         const response = await mealService.getAreas();
-        if (response.meals) {
+        if (!ignore && response.meals) {
           setAreas(response.meals);
+          setStatus('success');
         }
       } catch (err) {
-        setError('Failed to load. Please check your connection.');
-      } finally {
-        setLoading(false);
+        if (!ignore) {
+          console.error(err);
+          setErrorMessage('Failed to load cuisines. Please check your connection.');
+          setStatus('error');
+        }
       }
     };
 
     fetchAreas();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -40,7 +49,9 @@ export const Step1 = () => {
     }
   };
 
-  if (loading) {
+  const sortedAreas = areas.slice().sort((a, b) => a.strArea.localeCompare(b.strArea));
+
+  if (status === 'loading') {
     return (
       <div className="container">
         <div className={styles.messageContainer}>
@@ -50,11 +61,11 @@ export const Step1 = () => {
     );
   }
 
-  if (error) {
+  if (status === 'error') {
     return (
       <div className="container">
         <div className={styles.messageContainer}>
-          <p className={styles.errorMessage}>{error}</p>
+          <p className={styles.errorMessage}>{errorMessage}</p>
         </div>
       </div>
     );
@@ -63,7 +74,7 @@ export const Step1 = () => {
   return (
     <div className="container">
       <div className="card">
-        <h1>Select a Cuisine 🌍</h1>
+        <h2>Select a Cuisine</h2>
         <p>To start, tell us what kind of flavors you're in the mood for today.</p>
 
         <div className={styles.inputWrapper}>
@@ -71,9 +82,10 @@ export const Step1 = () => {
             value={state.preferences.area} 
             onChange={handleSelect}
             className={styles.select}
+            aria-label="Select a cuisine area"
           >
             <option value="">-- Select an area --</option>
-            {areas.map((area) => (
+            {sortedAreas.map((area) => (
               <option key={area.strArea} value={area.strArea}>
                 {area.strArea}
               </option>
@@ -82,8 +94,13 @@ export const Step1 = () => {
         </div>
 
         <div className={styles.actions}>
-           <button className="secondary" disabled>Back</button>
-           <button onClick={handleNext} disabled={!state.preferences.area}>
+           <button type="button" className="secondary" disabled>Back</button>
+           
+           <button 
+             type="button" 
+             onClick={handleNext} 
+             disabled={!state.preferences.area}
+           >
              Next
            </button>
         </div>
