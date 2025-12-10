@@ -1,118 +1,7 @@
-@use 'sass:color';
 @use '../../styles/variables' as *;
 
 .resultsContainer {
   text-align: center;
-}
-
-.recipeCard {
-  background: white;
-  border-radius: $radius;
-  overflow: hidden;
-  box-shadow: $shadow;
-  margin-bottom: $space-lg;
-  text-align: left;
-}
-
-.imageWrapper {
-  width: 100%;
-  height: 250px;
-  overflow: hidden;
-  position: relative;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s;
-  }
-}
-
-.content {
-  padding: $space-lg;
-}
-
-.tags {
-  display: flex;
-  gap: $space-sm;
-  margin-bottom: $space-md;
-}
-
-.tag {
-  background-color: $background;
-  color: $text-muted;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.recipeTitle {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: $text-main;
-  margin-bottom: $space-md;
-}
-
-.link {
-  display: inline-block;
-  color: $primary;
-  font-weight: 600;
-  margin-bottom: $space-lg;
-  
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-.feedbackSection {
-  border-top: 1px solid $border;
-  padding: $space-lg;
-  background-color: color.adjust($background, $lightness: 1%); 
-  text-align: center;
-}
-
-.feedbackTitle {
-  font-size: 1rem;
-  color: $text-muted;
-  margin-bottom: $space-md;
-}
-
-.buttonsGrid {
-  display: flex;
-  justify-content: center;
-  gap: $space-md;
-  
-  @media (max-width: 480px) {
-    flex-direction: column;
-    button { width: 100%; }
-  }
-}
-
-.btnLike {
-  background-color: $secondary;
-  
-  &:hover {
-    background-color: color.adjust($secondary, $lightness: -5%);
-  }
-}
-
-.btnDislike {
-  background-color: $danger;
-  
-  &:hover {
-    background-color: color.adjust($danger, $lightness: -5%);
-  }
-}
-
-.btnReroll {
-  background-color: $text-main;
-  margin-top: $space-md;
-  width: 100%;
-  
-  &:hover {
-    background-color: color.adjust($text-main, $lightness: 5%);
-  }
 }
 
 .loadingMessage {
@@ -120,10 +9,15 @@
   color: $text-muted;
   padding: $space-xl;
   font-size: 1.2rem;
+  line-height: 1.6;
 }
 
 .errorMessage {
   text-align: center;
   color: $danger;
   padding: $space-xl;
+}
+
+.errorButton {
+    width: 100%;
 }

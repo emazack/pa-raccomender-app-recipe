@@ -1,9 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaHeart, FaThumbsDown, FaRedo } from 'react-icons/fa';
+
 import { mealService } from '../../api/mealService';
 import { useWizard } from '../../context/WizardContext';
 import { useHistory } from '../../hooks/useHistory';
+import { findMatchingRecipes } from '../../utils/recommendationEngine';
+import { RecipeCard } from '../../components/ui/RecipeCard/RecipeCard';
 import styles from './Results.module.scss';
 
 import type { MealPreview, MealDetails, Recipe } from '../../types';
@@ -15,22 +17,23 @@ export const Results = () => {
 
   const [candidateList, setCandidateList] = useState<MealPreview[]>([]);
   const [currentRecipe, setCurrentRecipe] = useState<MealDetails | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<'loading' | 'error' | 'success'>('loading');
+  const [errorText, setErrorText] = useState<string | null>(null);
 
   const loadRecipeDetails = async (id: string) => {
-    setLoading(true);
+    setStatus('loading');
     try {
       const response = await mealService.getMealById(id);
       if (response.meals && response.meals.length > 0) {
         setCurrentRecipe(response.meals[0]);
+        setStatus('success');
       } else {
-        setError('Recipe details not found.');
+        setErrorText('Recipe details not found.');
+        setStatus('error');
       }
     } catch (err) {
-      setError('Error loading recipe details.');
-    } finally {
-      setLoading(false);
+      setErrorText('Error loading recipe details.');
+      setStatus('error');
     }
   };
 
@@ -42,46 +45,44 @@ export const Results = () => {
   }, []);
 
   useEffect(() => {
-    const fetchAndFilterCandidates = async () => {
+    let ignore = false;
+
+    const init = async () => {
       if (!state.preferences.ingredient || !state.preferences.area) {
         navigate('/');
         return;
       }
 
-      setLoading(true);
-      setError(null);
+      setStatus('loading');
+      setErrorText(null);
 
       try {
-        const [areaResponse, ingredientResponse] = await Promise.all([
-          mealService.filterByArea(state.preferences.area),
-          mealService.filterByIngredient(state.preferences.ingredient)
-        ]);
-
-        const areaMeals = areaResponse.meals || [];
-        const ingredientMeals = ingredientResponse.meals || [];
-
-        const areaIds = new Set(areaMeals.map(meal => meal.idMeal));
-
-        const perfectMatches = ingredientMeals.filter(meal => 
-          areaIds.has(meal.idMeal)
+        const matches = await findMatchingRecipes(
+          state.preferences.area,
+          state.preferences.ingredient
         );
 
-        if (perfectMatches.length > 0) {
-          setCandidateList(perfectMatches);
-          pickRandomRecipe(perfectMatches);
-        } else {
-          setError(`No ${state.preferences.area} recipes found with ${state.preferences.ingredient}. Try changing the ingredient.`);
-          setLoading(false);
+        if (!ignore) {
+          if (matches.length > 0) {
+            setCandidateList(matches);
+            pickRandomRecipe(matches);
+          } else {
+            setErrorText(`No ${state.preferences.area} recipes found with ${state.preferences.ingredient}.`);
+            setStatus('error');
+          }
         }
-
       } catch (err) {
-        console.error(err);
-        setError('Connection error. Please check your internet.');
-        setLoading(false);
+        if (!ignore) {
+          console.error(err);
+          setErrorText('Connection error. Please check your internet.');
+          setStatus('error');
+        }
       }
     };
 
-    fetchAndFilterCandidates();
+    init();
+
+    return () => { ignore = true; };
   }, [state.preferences.area, state.preferences.ingredient, navigate, pickRandomRecipe]);
 
 
@@ -104,22 +105,21 @@ export const Results = () => {
     pickRandomRecipe(candidateList);
   };
 
-
-  if (loading) {
+  if (status === 'loading') {
     return (
       <div className="container">
         <p className={styles.loadingMessage}>
-          Hunting for the perfect <b>{state.preferences.area}</b> recipe with <b>{state.preferences.ingredient}</b>...
+          Hunting for the perfect <b>{state.preferences.area}</b> recipe using <b>{state.preferences.ingredient}</b>...
         </p>
       </div>
     );
   }
   
-  if (error) {
+  if (status === 'error') {
     return (
       <div className="container">
-        <p className={styles.errorMessage}>{error}</p>
-        <button className="secondary" onClick={() => navigate('/step-2')} style={{ width: '100%' }}>
+        <p className={styles.errorMessage}>{errorText}</p>
+        <button className={`secondary ${styles.errorButton}`} onClick={() => navigate('/step-2')}>
           Try another ingredient
         </button>
       </div>
@@ -131,57 +131,14 @@ export const Results = () => {
   return (
     <div className="container">
       <div className={styles.resultsContainer}>
-        <h1>We found this for you! 🎉</h1>
+        <h2>We found this for you!</h2>
         
-        <div className={styles.recipeCard}>
-          <div className={styles.imageWrapper}>
-            <img src={currentRecipe.strMealThumb} alt={currentRecipe.strMeal} />
-          </div>
-          
-          <div className={styles.content}>
-            <div className={styles.tags}>
-              <span className={styles.tag}>{currentRecipe.strArea}</span>
-              <span className={styles.tag}>{currentRecipe.strCategory}</span>
-            </div>
-            
-            <h2 className={styles.recipeTitle}>{currentRecipe.strMeal}</h2>
-            
-            {currentRecipe.strYoutube && (
-              <a 
-                href={currentRecipe.strYoutube} 
-                target="_blank" 
-                rel="noreferrer" 
-                className={styles.link}
-              >
-                Watch on YouTube ↗
-              </a>
-            )}
-
-            <div className={styles.feedbackSection}>
-              <p className={styles.feedbackTitle}>Did this match your preference?</p>
-              
-              <div className={styles.buttonsGrid}>
-                <button 
-                  className={styles.btnLike} 
-                  onClick={() => handleFeedback('like')}
-                >
-                  <FaHeart /> Yes, I love it!
-                </button>
-
-                <button 
-                  className={styles.btnDislike} 
-                  onClick={() => handleFeedback('dislike')}
-                >
-                  <FaThumbsDown /> No, thanks
-                </button>
-              </div>
-
-              <button className={styles.btnReroll} onClick={handleReroll}>
-                <FaRedo /> New Idea
-              </button>
-            </div>
-          </div>
-        </div>
+        <RecipeCard 
+          recipe={currentRecipe}
+          onLike={() => handleFeedback('like')}
+          onDislike={() => handleFeedback('dislike')}
+          onReroll={handleReroll}
+        />
 
         <button className="secondary" onClick={() => navigate('/step-2')}>
           Back to Search
