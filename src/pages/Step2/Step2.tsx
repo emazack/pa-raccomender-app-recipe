@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mealService } from '../../api/mealService';
 import { useWizard } from '../../context/WizardContext';
+import { Autocomplete, type AutocompleteOption } from '../../components/ui/Autocomplete/Autocomplete';
 import styles from './Step2.module.scss';
 import type { Ingredient } from '../../types';
 
@@ -9,109 +10,85 @@ export const Step2 = () => {
   const navigate = useNavigate();
   const { state, dispatch } = useWizard();
 
-  const [allIngredients, setAllIngredients] = useState<Ingredient[]>([]);
-  const [filteredIngredients, setFilteredIngredients] = useState<Ingredient[]>([]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [status, setStatus] = useState<'idle' | 'loading' | 'error' | 'success'>('loading');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [inputValue, setInputValue] = useState(state.preferences.ingredient || '');
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let ignore = false;
+
     const fetchIngredients = async () => {
       try {
         const response = await mealService.getIngredients();
-        if (response.meals) {
-          setAllIngredients(response.meals);
+        if (!ignore && response.meals) {
+          setIngredients(response.meals);
+          setStatus('success');
         }
       } catch (err) {
-        setError('Failed to load ingredients. Please try again.');
-      } finally {
-        setLoading(false);
+        if (!ignore) {
+          console.error(err);
+          setErrorMessage('Failed to load ingredients.');
+          setStatus('error');
+        }
       }
     };
 
     fetchIngredients();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setInputValue(value);
-    
-    if (value === '') {
-      dispatch({ type: 'SET_INGREDIENT', payload: '' });
-    }
+  const autocompleteOptions: AutocompleteOption[] = ingredients.map(ing => ({
+    id: ing.idIngredient,
+    label: ing.strIngredient
+  }));
 
-    if (value.length > 0) {
-      const filtered = allIngredients.filter((ing) =>
-        ing.strIngredient.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredIngredients(filtered);
-      setShowSuggestions(true);
-    } else {
-      setShowSuggestions(false);
+  const handleInputChange = (newValue: string) => {
+    setInputValue(newValue);
+    if (newValue === '') {
+      dispatch({ type: 'SET_INGREDIENT', payload: '' });
     }
   };
 
-  const handleSelectIngredient = (ingredientName: string) => {
-    setInputValue(ingredientName);
-    setShowSuggestions(false);
-    dispatch({ type: 'SET_INGREDIENT', payload: ingredientName });
+  const handleSelect = (option: AutocompleteOption) => {
+    setInputValue(option.label);
+    dispatch({ type: 'SET_INGREDIENT', payload: option.label });
   };
 
   const handleNext = () => {
     if (state.preferences.ingredient) {
-      navigate('/results'); 
+      navigate('/results');
     }
-  };
-
-  const handleBack = () => {
-    navigate('/');
   };
 
   return (
     <div className="container">
       <div className="card">
-        <h1>Favorite Ingredient 🍅</h1>
+        <h2>Favorite Ingredient</h2>
         <p>Do you have a specific ingredient in mind? Start typing to search.</p>
 
-        {loading && <p className={styles.loadingText}>Loading ingredients...</p>}
-        {error && <p className={styles.errorMessage}>{error}</p>}
+        {status === 'loading' && <p className={styles.loadingText}>Loading ingredients database...</p>}
+        
+        {status === 'error' && <p className={styles.errorMessage}>{errorMessage}</p>}
 
-        {!loading && !error && (
-          <div className={styles.searchContainer}>
-            <input
-              type="text"
-              className={styles.searchInput}
-              placeholder="e.g. Chicken, Beef, Garlic..."
+        {status === 'success' && (
+          <div className={styles.searchWrapper}>
+            <Autocomplete 
+              options={autocompleteOptions}
               value={inputValue}
               onChange={handleInputChange}
-              onFocus={() => inputValue && setShowSuggestions(true)}
+              onSelect={handleSelect}
+              placeholder="e.g. Chicken, Beef, Garlic..."
             />
-
-            {showSuggestions && inputValue.length > 0 && (
-              <ul className={styles.suggestionsList}>
-                {filteredIngredients.length > 0 ? (
-                  filteredIngredients.map((ing) => (
-                    <li
-                      key={ing.idIngredient}
-                      className={styles.suggestionItem}
-                      onClick={() => handleSelectIngredient(ing.strIngredient)}
-                    >
-                      {ing.strIngredient}
-                    </li>
-                  ))
-                ) : (
-                  <li className={styles.noResults}>
-                    No ingredients found.
-                  </li>
-                )}
-              </ul>
-            )}
           </div>
         )}
 
         <div className={styles.actions}>
-          <button className="secondary" onClick={handleBack}>
+          <button className="secondary" onClick={() => navigate('/')}>
             Back
           </button>
           

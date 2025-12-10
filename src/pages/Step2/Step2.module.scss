@@ -1,63 +1,7 @@
-@use 'sass:color';
 @use '../../styles/variables' as *;
 
-.searchContainer {
-  position: relative;
+.searchWrapper {
   margin-bottom: $space-lg;
-}
-
-.searchInput {
-  width: 100%;
-  padding: $space-md;
-  border: 2px solid $border;
-  border-radius: $radius;
-  font-size: 1rem;
-  outline: none;
-
-  &:focus {
-    border-color: $primary;
-  }
-}
-
-.suggestionsList {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid $border;
-  border-radius: 0 0 $radius $radius;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 10;
-  box-shadow: $shadow;
-}
-
-.suggestionItem {
-  padding: $space-md;
-  cursor: pointer;
-  border-bottom: 1px solid color.adjust($border, $lightness: 10%);
-  transition: background 0.2s;
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &:hover {
-    background-color: $background;
-    color: $primary;
-  }
-}
-
-.noResults {
-  @extend .suggestionItem;
-  cursor: default;
-  color: $text-muted;
-  
-  &:hover {
-    background-color: white;
-    color: $text-muted;
-  }
 }
 
 .actions {
@@ -68,10 +12,7 @@
 
   @media (max-width: 480px) {
     flex-direction: column-reverse;
-    
-    button {
-      width: 100%;
-    }
+    button { width: 100%; }
   }
 }
 

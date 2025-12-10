@@ -1,0 +1,64 @@
+@use 'sass:color';
+@use '../../styles/variables' as *;
+
+.wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+  padding: $space-md;
+  border: 2px solid $border;
+  border-radius: $radius;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: $primary;
+  }
+}
+
+.list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid $border;
+  border-radius: 0 0 $radius $radius;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: $shadow;
+  margin-top: 4px;
+}
+
+.item {
+  padding: $space-md;
+  cursor: pointer;
+  border-bottom: 1px solid color.adjust($border, $lightness: 10%);
+  color: $text-main;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: $background;
+    color: $primary;
+  }
+}
+
+.noResults {
+  @extend .item;
+  cursor: default;
+  color: $text-muted;
+  font-style: italic;
+
+  &:hover {
+    background-color: white;
+    color: $text-muted;
+  }
+}
