@@ -1,0 +1,85 @@
+@use 'sass:color';
+@use '../../../styles/variables' as *;
+
+.item {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: $space-md;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  border: 1px solid transparent;
+  transition: transform 0.2s, border-color 0.2s;
+
+  &:hover {
+    transform: translateX(4px);
+    border-color: $primary;
+  }
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    text-align: center;
+    gap: $space-md;
+  }
+}
+
+.thumbnail {
+  width: 80px;
+  height: 80px;
+  border-radius: $radius;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.info {
+  flex: 1;
+  margin-left: $space-md;
+  
+  @media (max-width: 600px) {
+    margin-left: 0;
+  }
+}
+
+.recipeName {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: $text-main;
+  margin-bottom: 4px;
+}
+
+.meta {
+  font-size: 0.9rem;
+  color: $text-muted;
+  margin-bottom: 4px;
+}
+
+.timestamp {
+  font-size: 0.8rem;
+  color: color.adjust($text-muted, $lightness: 20%);
+}
+
+.badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: $space-md;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &.like {
+    background-color: color.adjust($secondary, $lightness: 40%);
+    color: color.adjust($secondary, $lightness: -10%);
+    border: 1px solid $secondary;
+  }
+
+  &.dislike {
+    background-color: color.adjust($danger, $lightness: 40%);
+    color: color.adjust($danger, $lightness: -10%);
+    border: 1px solid $danger;
+  }
+}
