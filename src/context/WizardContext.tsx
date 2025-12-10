@@ -2,6 +2,8 @@ import React, { createContext, useContext, useReducer } from 'react';
 import type { ReactNode } from 'react';
 import type { UserPreferences } from '../types';
 
+//// State, Actions, and Reducer
+// Types and Initial State
 interface WizardState {
   preferences: UserPreferences;
 }
@@ -13,11 +15,13 @@ const initialState: WizardState = {
   },
 };
 
+// Actions
 type WizardAction =
   | { type: 'SET_AREA'; payload: string }
   | { type: 'SET_INGREDIENT'; payload: string }
   | { type: 'RESET' };
 
+// Reducer
 const wizardReducer = (state: WizardState, action: WizardAction): WizardState => {
   switch (action.type) {
     case 'SET_AREA':
@@ -36,12 +40,13 @@ const wizardReducer = (state: WizardState, action: WizardAction): WizardState =>
       return state;
   }
 };
-
+//// Context
 const WizardContext = createContext<{
   state: WizardState;
   dispatch: React.Dispatch<WizardAction>;
 } | undefined>(undefined);
 
+// Provider
 export const WizardProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(wizardReducer, initialState);
 
@@ -52,7 +57,7 @@ export const WizardProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-
+// Custom Hook
 export const useWizard = () => {
   const context = useContext(WizardContext);
   if (!context) {
