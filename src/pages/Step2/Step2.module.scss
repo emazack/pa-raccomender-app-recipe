@@ -8,7 +8,7 @@
   display: flex;
   gap: $space-md;
   margin-top: $space-xl;
-  justify-content: space-between;
+  justify-content: flex-end;
 
   @media (max-width: 480px) {
     flex-direction: column-reverse;

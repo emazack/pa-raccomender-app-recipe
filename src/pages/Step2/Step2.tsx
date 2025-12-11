@@ -13,7 +13,7 @@ export const Step2 = () => {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error' | 'success'>('loading');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  
+
   const [inputValue, setInputValue] = useState(state.preferences.ingredient || '');
 
   useEffect(() => {
@@ -49,14 +49,7 @@ export const Step2 = () => {
 
   const handleInputChange = (newValue: string) => {
     setInputValue(newValue);
-    if (newValue === '') {
-      dispatch({ type: 'SET_INGREDIENT', payload: '' });
-    }
-  };
-
-  const handleSelect = (option: AutocompleteOption) => {
-    setInputValue(option.label);
-    dispatch({ type: 'SET_INGREDIENT', payload: option.label });
+    dispatch({ type: 'SET_INGREDIENT', payload: newValue });
   };
 
   const handleNext = () => {
@@ -72,16 +65,15 @@ export const Step2 = () => {
         <p>Do you have a specific ingredient in mind? Start typing to search.</p>
 
         {status === 'loading' && <p className={styles.loadingText}>Loading ingredients database...</p>}
-        
+
         {status === 'error' && <p className={styles.errorMessage}>{errorMessage}</p>}
 
         {status === 'success' && (
           <div className={styles.searchWrapper}>
-            <Autocomplete 
+            <Autocomplete
               options={autocompleteOptions}
               value={inputValue}
               onChange={handleInputChange}
-              onSelect={handleSelect}
               placeholder="e.g. Chicken, Beef, Garlic..."
             />
           </div>
@@ -91,7 +83,7 @@ export const Step2 = () => {
           <button className="secondary" onClick={() => navigate('/')}>
             Back
           </button>
-          
+
           <button onClick={handleNext} disabled={!state.preferences.ingredient}>
             Find Recipe
           </button>
