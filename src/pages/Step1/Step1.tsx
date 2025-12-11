@@ -94,7 +94,6 @@ export const Step1 = () => {
         </div>
 
         <div className={styles.actions}>
-           <button type="button" className="secondary" disabled>Back</button>
            
            <button 
              type="button" 
