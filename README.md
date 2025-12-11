@@ -81,7 +81,7 @@ The project uses **Vitest** and **React Testing Library**.
 * **Core:** React 18, TypeScript
 * **Build Tool:** Vite
 * **Routing:** React Router DOM v6
-* **AI Powered Styling:** SCSS Modules + Global Variables
+* **AI Styling:** SCSS Modules + Global Variables
 * **Testing:** Vitest, React Testing Library, jsdom
 * **Icons:** React Icons
 

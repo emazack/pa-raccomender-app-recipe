@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useHistory } from '../../hooks/useHistory';
 import { useWizard } from '../../context/WizardContext';
-import { HistoryItem } from '../../components/ui/HistoryItem/HistoryItem'; // Importiamo il componente
+import { HistoryItem } from '../../components/ui/HistoryItem/HistoryItem';
 import styles from './History.module.scss';
 
 export const History = () => {
