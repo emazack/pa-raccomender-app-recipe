@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { HistoryItem, Recipe, UserPreferences } from '../types';
 
-const STORAGE_KEY = 'prima_recipe_history';
+const STORAGE_KEY = 'recipe_history';
 
 export const useHistory = () => {
   const [history, setHistory] = useState<HistoryItem[]>([]);

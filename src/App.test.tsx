@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { WizardProvider } from './context/WizardContext';
 import App from './App';
 
-describe('App Smoke Test', () => {
+describe('App Test', () => {
   it('renders without crashing', () => {
     render(
       <WizardProvider>
