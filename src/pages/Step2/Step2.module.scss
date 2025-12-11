@@ -7,7 +7,6 @@
 .actions {
   display: flex;
   gap: $space-md;
-  margin-top: $space-xl;
   justify-content: flex-end;
 
   @media (max-width: 480px) {
